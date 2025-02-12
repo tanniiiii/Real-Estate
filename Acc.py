@@ -147,4 +147,12 @@ for i in range(total_pages):
             list_per_emp = []
             date_list = []
             emp_page_count = 1
-            prev_fetch_dict = {
+            prev_fetch_dict = {}
+
+pdf.close()
+
+# Final Results
+if task_to_perform == 1:
+    print("\nTotal NOT APPROVED timesheets count:", not_approved_count)
+if task_to_perform == 3:
+    print("\nTotal Employee Count:", emp_count)
