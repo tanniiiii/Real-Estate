@@ -1,12 +1,9 @@
-import pandas as pd  
+def to_camel_case(name):
+    parts = name.split('_')
+    return '_'.join([parts[0].capitalize()] + [p.lower() for p in parts[1:]])
 
-# Load the Excel file  
-df = pd.read_excel("your_file.xlsx")  
+# Example usage
+names = [", "ORDER_ID", "CUSTOMER_NAME"]
+camel_case_names = [to_camel_case(name) for name in names]
 
-# Remove text inside parentheses including the parentheses  
-df["Employee Name"] = df["Employee Name"].str.replace(r"\s*\(.*?\)", "", regex=True)  
-
-# Save the cleaned data back to Excel  
-df.to_excel("cleaned_file.xlsx", index=False)  
-
-print("User IDs removed successfully!")
+print(camel_case_names)
