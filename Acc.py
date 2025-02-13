@@ -1,4 +1,7 @@
-pip install --force-reinstall pdfplumber cryptography
-
 pip install --upgrade pip setuptools wheel
-pip install --upgrade pdfminer.six pdfplumber cryptography
+
+pip install --force-reinstall --no-cache-dir cryptography
+
+winget install rustlang.rustup
+
+rustup update
