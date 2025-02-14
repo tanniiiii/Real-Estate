@@ -1,43 +1,55 @@
 import streamlit as st
-import streamlit_antd_components as sac
 from itertools import chain
-
-# Sample trade view columns
-trade_view_columns = ["Trade_Count_sum", "BUSINESS_DATE", "Trade_Price_avg", "Trade_Volume"]
-
-# Default selection
-default_selection = ["Trade_Count_sum"]
+import streamlit_antd_components as sac
 
 # Initialize session state
-if "selected_columns" not in st.session_state:
-    st.session_state.selected_columns = list(default_selection)
+if 'selected_columns' not in st.session_state:
+    st.session_state.selected_columns = ["Trade_Count_sum"]  # Default selection
+if 'search_columns' not in st.session_state:
+    st.session_state.search_columns = []
 
-# Sidebar: Tree selection
-category_tree = [{"label": col, "value": col} for col in trade_view_columns if col != "BUSINESS_DATE"]
-tree_selection = sac.tree(
-    items=category_tree,
-    label="Features",
-    open_all=False,
-    checkbox=True,
-    key='feature_selector'
-)
+# Sidebar tree component
+with st.sidebar:
+    tree_selection = sac.tree(
+        items=category_tree,
+        label="Features",
+        open_all=False,
+        checkbox=True,
+        key='feature_selector'
+    )
 
-# Combine tree selections
-new_selection = list(chain(default_selection, tree_selection))
+# Main interface
+st.header("Column Selection")
 
-# Search and select columns using multiselect
-search_selection = st.multiselect(
-    "Search and select columns",
-    options=[col for col in trade_view_columns if col != "BUSINESS_DATE"]
-)
-
-# Add selected columns if not already in the list
-for col in search_selection:
-    if col in new_selection:
-        st.warning(f"Column '{col}' is already selected.")
+# Search and add functionality
+search_term = st.text_input("Search and add features", key='search_box')
+if st.button("Add") and search_term:
+    valid_columns = [col for col in trade_view_columns 
+                    if col != 'BUSINESS_DATE' and col not in st.session_state.selected_columns]
+    
+    if search_term in valid_columns:
+        st.session_state.search_columns.append(search_term)
+        st.session_state.search_box = ""  # Clear search box
     else:
-        st.session_state.selected_columns.append(col)
-        st.success(f"Added '{col}' to selection.")
+        st.warning(f"Column '{search_term}' is invalid or already selected")
 
-# Show selected columns
+# Combine all selections
+all_selected = list(chain(
+    ["Trade_Count_sum"],  # Default
+    st.session_state.search_columns,
+    tree_selection
+))
+
+# Check for duplicates
+unique_selected = list(set(all_selected))
+duplicates = [item for item in set(all_selected) if all_selected.count(item) > 1]
+
+if len(duplicates) > 0:
+    st.warning(f"Duplicate columns detected: {', '.join(duplicates)}")
+
+# Update session state
+if sorted(all_selected) != sorted(st.session_state.selected_columns):
+    st.session_state.selected_columns = unique_selected
+
+# Display final selection
 st.write("Selected Columns:", st.session_state.selected_columns)
